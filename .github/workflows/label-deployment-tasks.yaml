@@ -2,22 +2,67 @@ name: Label Deployment Tasks
 
 on:
   pull_request_target:
-    types:
-      - opened
-      - ready_for_review
-    paths:
-      - 'lib/identity/repo/data_migrations/*.ex'
+  #push:
 
+    #paths:
+    #  - 'lib/identity/repo/data_migrations/*.ex'
+
+            #pullRequestNumbers.map( (pullRequestNumber) =>
+            #  {
+            #    result = github.rest.issues.addLabels({
+            #      issue_number: pullRequestNumber,
+            #      owner: context.repo.owner,
+            #      repo: context.repo.repo,
+            #      labels: ['Deployment Task']
+            #    })
+            #    console.log(result)
+            #  }
+            #)
 jobs:
   apply-label:
     runs-on: ubuntu-latest
+    env:
+      PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
-      - uses: actions/github-script@v6
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Check if migrations changed
+        id: migrations-changed
+        run: echo "MIGRATIONS_CHANGED=$(git diff --diff-filter=AM --exit-code --quiet $GITHUB_BASE_REF -- lib/identity/repo/data_migrations)" >> $GITHUB_OUTPUT
+      - name: debug
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "$GITHUB_BASE_REF"
+      - name: Maybe add deployment task label
+        uses: actions/github-script@v6
         with:
           script: |
-            github.rest.issues.addLabels({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              labels: ['Deployment Task']
+            const baseParams = {owner: context.repo.owner, repo: context.repo.repo}
+            const findMigrationFile = (files) => {
+              return files.find(file => (file.status == "modified" || file.status == "added") && file.filename.startsWith("lib/identity/repo/data_migrations/")
+              )
+            }
+
+            const getPrsWithFileChanges = async (sha) => {
+              const prNumbers = await github.rest.repos.listPullRequestsAssociatedWithCommit({...baseParams, commit_sha: sha})
+              .then( result => result.data.map( pr => pr.number ) )
+
+              const listFilesPromises = prNumbers.map(prNumber => github.rest.pulls.listFiles({...baseParams, pull_number: prNumber}))
+              const allPromises = await Promise.all(listFilesPromises)
+              return allPromises.map( (response, index) => { return {prNumber: prNumbers[index], files: response.data} })
+            }
+
+            const pullRequestFileChanges = await getPrsWithFileChanges(process.env.GITHUB_SHA)
+            const labelPromises = pullRequestFileChanges.map( pr => {
+              migrationFile = findMigrationFile(pr.files)
+              if (migrationFile) {
+                console.log(`Applying Deployment Task label to ${pr.prNumber} because of file ${migrationFile.filename}`)
+                github.rest.issues.addLabels({...baseParams, issue_number: pr.prNumber, labels: ["Deployment Task"]})
+              } else {
+                console.log(`Removing Deployment Task label from ${pr.prNumber}`)
+                github.rest.issues.removeLabel({...baseParams, issue_number: pr.prNumber, name: "Deployment Task"})
+              }
             })
+
+            return Promise.all(labelPromises)
