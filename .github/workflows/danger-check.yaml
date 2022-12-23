@@ -1,0 +1,44 @@
+name: Danger
+
+on:
+  workflow_call:
+    inputs:
+      dangerfile-path:
+        description: "danger file to execute. e.g. danger/dangerfile-pull-request-validations.ts"
+        required: true
+        type: string
+
+      fetch-depth:
+        description: "depth of repository to fetch out"
+        required: false
+        default: 1
+        type: string
+
+    secrets:
+      danger-api-token:
+        description: "api token used by danger, if danger check uses elevated API then default GITHUB_TOKEN will not suffice"
+        required: true
+
+#concurrency:
+#  group: danger-${{ github.ref }}
+#  cancel-in-progress: true
+
+jobs:
+  danger-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ inputs.fetch-depth }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "yarn"
+          cache-dependency-path: "yarn.lock"
+
+      - name: Rerun danger check on pull request
+        run: |
+          yarn danger ci --dangerfile ${{ inputs.dangerfile-path }}
+        env:
+          DANGER_GITHUB_API_TOKEN: ${{ secrets.danger-api-token }}

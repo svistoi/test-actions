@@ -1,0 +1,14 @@
+---
+name: Danger Report
+on:
+  pull_request_review:
+    types: [submitted, edited]
+
+jobs:
+  danger-check:
+    if: ${{ !github.event.pull_request.draft }}
+    uses: ./.github/workflows/danger-check.yaml
+    with:
+      dangerfile-path: ./danger/danger.ts
+    secrets:
+      danger-api-token: ${{ secrets.GITHUB_TOKEN }}
