@@ -12,14 +12,15 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            const LABEL = "Deployment Task"
             const baseParams = {owner: context.repo.owner, repo: context.repo.repo}
             const getPrsWithFileChanges = async (sha) => {
-              const prNumbers = await github.rest.repos.listPullRequestsAssociatedWithCommit({...baseParams, commit_sha: sha})
-              .then( result => result.data.map( pr => pr.number ) )
+              const pullRequests = await github.rest.repos.listPullRequestsAssociatedWithCommit({...baseParams, commit_sha: sha})
+              .then( result => result.data )
 
-              const listFilesPromises = prNumbers.map(prNumber => github.rest.pulls.listFiles({...baseParams, pull_number: prNumber}))
+              const listFilesPromises = pullRequests.map(pr => github.rest.pulls.listFiles({...baseParams, pull_number: pr.number}))
               const allPromises = await Promise.all(listFilesPromises)
-              return allPromises.map( (response, index) => { return {prNumber: prNumbers[index], files: response.data} })
+              return allPromises.map((response, index) => {return {...pullRequests[index], files: response.data}})
             }
 
             const findMigrationFile = (files) => {
@@ -27,16 +28,14 @@ jobs:
               )
             }
 
-            const pullRequestFileChanges = await getPrsWithFileChanges(process.env.GITHUB_SHA)
-            const labelPromises = pullRequestFileChanges.map( pr => {
+            const pullRequests = await getPrsWithFileChanges(process.env.GITHUB_SHA)
+            const labelPromises = await pullRequests.forEach( async (pr) => {
               migrationFile = findMigrationFile(pr.files)
               if (migrationFile) {
-                console.log(`Applying Deployment Task label to ${pr.prNumber} because of file ${migrationFile.filename}`)
-                github.rest.issues.addLabels({...baseParams, issue_number: pr.prNumber, labels: ["Deployment Task"]})
-              } else {
-                console.log(`Removing Deployment Task label from ${pr.prNumber}`)
-                github.rest.issues.removeLabel({...baseParams, issue_number: pr.prNumber, name: "Deployment Task"})
+                console.log(`Applying ${LABEL} label to ${pr.number} because of file ${migrationFile.filename}`)
+                await github.rest.issues.addLabels({...baseParams, issue_number: pr.number, labels: [LABEL]})
+              } else if (pr.labels.includes(LABEL)) {
+                console.log(`Removing ${LABEL} label from ${pr.number}`)
+                await github.rest.issues.removeLabel({...baseParams, issue_number: pr.number, name: LABEL})
               }
             })
-
-            return Promise.all(labelPromises)
