@@ -12,30 +12,32 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const LABEL = "Deployment Task"
-            const MIGRATION_PREFIX_PATH = "lib/identity/repo/data_migrations/"
-            const baseParams = {owner: context.repo.owner, repo: context.repo.repo}
-            const getPrsWithFileChanges = async (sha) => {
-              const pullRequests = await github.rest.repos.listPullRequestsAssociatedWithCommit({...baseParams, commit_sha: sha})
-              .then( result => result.data )
+            const LABEL = "Deployment Task";
+            const MIGRATION_PREFIX_PATH = "lib/identity/repo/data_migrations/";
 
-              const listFilesPromises = pullRequests.map(pr => github.rest.pulls.listFiles({...baseParams, pull_number: pr.number}))
-              const allPromises = await Promise.all(listFilesPromises)
-              return allPromises.map((response, index) => {return {...pullRequests[index], files: response.data}})
-            }
+            const baseParams = { owner: context.repo.owner, repo: context.repo.repo };
+            const getPrsWithFileChanges = async (sha) => {
+                const pullRequests = await github.rest.repos.listPullRequestsAssociatedWithCommit({ ...baseParams, commit_sha: sha }).then((result) => result.data);
+
+                const listFilesPromises = pullRequests.map((pr) => github.rest.pulls.listFiles({ ...baseParams, pull_number: pr.number }));
+                const allPromises = await Promise.all(listFilesPromises);
+                return allPromises.map((response, index) => {
+                    return { ...pullRequests[index], files: response.data };
+                });
+            };
 
             const findMigrationFile = (files) => {
-              return files.find(file => ["modified", "added"].includes(file.status) && file.filename.startsWith(MIGRATION_PREFIX_PATH))
-            }
+                return files.find((file) => ["modified", "added"].includes(file.status) && file.filename.startsWith(MIGRATION_PREFIX_PATH));
+            };
 
-            const pullRequests = await getPrsWithFileChanges(process.env.GITHUB_SHA)
-            const labelPromises = await pullRequests.forEach( async (pr) => {
-              migrationFile = findMigrationFile(pr.files)
-              if (migrationFile) {
-                console.log(`Applying ${LABEL} label to PR:${pr.number} because of file ${migrationFile.filename}`)
-                await github.rest.issues.addLabels({...baseParams, issue_number: pr.number, labels: [LABEL]})
-              } else if (pr.labels.includes(LABEL)) {
-                console.log(`Removing ${LABEL} label from PR:${pr.number}`)
-                await github.rest.issues.removeLabel({...baseParams, issue_number: pr.number, name: LABEL})
-              }
-            })
+            const pullRequests = await getPrsWithFileChanges(process.env.GITHUB_SHA);
+            const labelPromises = await pullRequests.forEach(async (pr) => {
+                migrationFile = findMigrationFile(pr.files);
+                if (migrationFile) {
+                    console.log(`Applying ${LABEL} label to PR:${pr.number} because of file ${migrationFile.filename}`);
+                    await github.rest.issues.addLabels({ ...baseParams, issue_number: pr.number, labels: [LABEL] });
+                } else if (pr.labels.includes(LABEL)) {
+                    console.log(`Removing ${LABEL} label from PR:${pr.number}`);
+                    await github.rest.issues.removeLabel({ ...baseParams, issue_number: pr.number, name: LABEL });
+                }
+            });
