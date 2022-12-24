@@ -13,11 +13,6 @@ jobs:
         with:
           script: |
             const baseParams = {owner: context.repo.owner, repo: context.repo.repo}
-            const findMigrationFile = (files) => {
-              return files.find(file => (file.status == "modified" || file.status == "added") && file.filename.startsWith("lib/identity/repo/data_migrations/")
-              )
-            }
-
             const getPrsWithFileChanges = async (sha) => {
               const prNumbers = await github.rest.repos.listPullRequestsAssociatedWithCommit({...baseParams, commit_sha: sha})
               .then( result => result.data.map( pr => pr.number ) )
@@ -25,6 +20,11 @@ jobs:
               const listFilesPromises = prNumbers.map(prNumber => github.rest.pulls.listFiles({...baseParams, pull_number: prNumber}))
               const allPromises = await Promise.all(listFilesPromises)
               return allPromises.map( (response, index) => { return {prNumber: prNumbers[index], files: response.data} })
+            }
+
+            const findMigrationFile = (files) => {
+              return files.find(file => (file.status == "modified" || file.status == "added") && file.filename.startsWith("lib/identity/repo/data_migrations/")
+              )
             }
 
             const pullRequestFileChanges = await getPrsWithFileChanges(process.env.GITHUB_SHA)
