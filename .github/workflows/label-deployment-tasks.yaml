@@ -13,6 +13,7 @@ jobs:
         with:
           script: |
             const LABEL = "Deployment Task"
+            const MIGRATION_PREFIX_PATH = "lib/identity/repo/data_migrations/"
             const baseParams = {owner: context.repo.owner, repo: context.repo.repo}
             const getPrsWithFileChanges = async (sha) => {
               const pullRequests = await github.rest.repos.listPullRequestsAssociatedWithCommit({...baseParams, commit_sha: sha})
@@ -24,8 +25,7 @@ jobs:
             }
 
             const findMigrationFile = (files) => {
-              return files.find(file => (file.status == "modified" || file.status == "added") && file.filename.startsWith("lib/identity/repo/data_migrations/")
-              )
+              return files.find(file => ["modified", "added"].includes(file.status) && file.filename.startsWith(MIGRATION_PREFIX_PATH))
             }
 
             const pullRequests = await getPrsWithFileChanges(process.env.GITHUB_SHA)
