@@ -1,8 +1,8 @@
 name: Label Deployment Tasks
 
 on:
-  pull_request_target:
-  #push:
+  pull_request:
+  push:
 
     #paths:
     #  - 'lib/identity/repo/data_migrations/*.ex'
