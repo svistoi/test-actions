@@ -4,37 +4,13 @@ on:
   pull_request:
   push:
 
-    #paths:
-    #  - 'lib/identity/repo/data_migrations/*.ex'
-
-            #pullRequestNumbers.map( (pullRequestNumber) =>
-            #  {
-            #    result = github.rest.issues.addLabels({
-            #      issue_number: pullRequestNumber,
-            #      owner: context.repo.owner,
-            #      repo: context.repo.repo,
-            #      labels: ['Deployment Task']
-            #    })
-            #    console.log(result)
-            #  }
-            #)
 jobs:
   apply-label:
     runs-on: ubuntu-latest
     env:
       PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: Check if migrations changed
-        id: migrations-changed
-        run: echo "MIGRATIONS_CHANGED=$(git diff --diff-filter=AM --exit-code --quiet $GITHUB_BASE_REF -- lib/identity/repo/data_migrations)" >> $GITHUB_OUTPUT
-      - name: debug
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "$GITHUB_BASE_REF"
-      - name: Maybe add deployment task label
+      - name: Label PR With Deployment Task
         uses: actions/github-script@v6
         with:
           script: |
