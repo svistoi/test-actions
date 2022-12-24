@@ -7,8 +7,6 @@ on:
 jobs:
   apply-label:
     runs-on: ubuntu-latest
-    env:
-      PR_NUMBER: ${{ github.event.pull_request.number }}
     steps:
       - name: Label PR With Deployment Task
         uses: actions/github-script@v6
