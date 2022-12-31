@@ -14,13 +14,13 @@ jobs:
           script: |
             const LABEL = "Deployment Task";
             const MIGRATION_PREFIX_PATH = "lib/identity/repo/data_migrations/";
+            const BASE_PARAMS = { owner: context.repo.owner, repo: context.repo.repo };
 
-            const baseParams = { owner: context.repo.owner, repo: context.repo.repo };
             const findMigrationFile = (files) => {
                 return files.find((file) => ["modified", "added"].includes(file.status) && file.filename.startsWith(MIGRATION_PREFIX_PATH));
             };
             const findMigrationFileForPr = async (pr) => {
-                const iterator = github.paginate.iterator(github.rest.pulls.listFiles, { ...baseParams, pull_number: pr.number })
+                const iterator = github.paginate.iterator(github.rest.pulls.listFiles, { ...BASE_PARAMS, pull_number: pr.number })
 
                 for await (const { data: files } of iterator) {
                     migrationFile = findMigrationFile(files)
@@ -30,7 +30,7 @@ jobs:
             }
 
             const getPrsWithMaybeMigrationFile = async (sha) => {
-                const {data: pullRequests} = await github.rest.repos.listPullRequestsAssociatedWithCommit({ ...baseParams, commit_sha: sha })
+                const {data: pullRequests} = await github.rest.repos.listPullRequestsAssociatedWithCommit({ ...BASE_PARAMS, commit_sha: sha })
                 return Promise.all(pullRequests.map((pr) => findMigrationFileForPr(pr)))
             };
 
@@ -38,9 +38,9 @@ jobs:
             const labelPromises = await pullRequests.forEach(async (pr) => {
                 if (pr.file) {
                     console.log(`Applying ${LABEL} label to PR:${pr.number} because of file ${pr.file.filename}`);
-                    await github.rest.issues.addLabels({ ...baseParams, issue_number: pr.number, labels: [LABEL] });
+                    await github.rest.issues.addLabels({ ...BASE_PARAMS, issue_number: pr.number, labels: [LABEL] });
                 } else if (pr.labels.includes(LABEL)) {
                     console.log(`Removing ${LABEL} label from PR:${pr.number}`);
-                    await github.rest.issues.removeLabel({ ...baseParams, issue_number: pr.number, name: LABEL });
+                    await github.rest.issues.removeLabel({ ...BASE_PARAMS, issue_number: pr.number, name: LABEL });
                 }
             });
