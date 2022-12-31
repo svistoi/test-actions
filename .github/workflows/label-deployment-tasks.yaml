@@ -24,11 +24,10 @@ jobs:
 
                 for await (const { data: files } of iterator) {
                     migrationFile = findMigrationFile(files)
-                    if (migrationFile) return {...pr, file: migrationFile}
+                    if (migrationFile) return {...pr, migrationFile: migrationFile}
                 }
                 return pr
             }
-
             const getPrsWithMaybeMigrationFile = async (sha) => {
                 const {data: pullRequests} = await github.rest.repos.listPullRequestsAssociatedWithCommit({ ...BASE_PARAMS, commit_sha: sha })
                 return Promise.all(pullRequests.map((pr) => findMigrationFileForPr(pr)))
@@ -36,8 +35,8 @@ jobs:
 
             const pullRequests = await getPrsWithMaybeMigrationFile(process.env.GITHUB_SHA);
             const labelPromises = await pullRequests.forEach(async (pr) => {
-                if (pr.file) {
-                    console.log(`Applying ${LABEL} label to PR:${pr.number} because of file ${pr.file.filename}`);
+                if (pr.migrationFile) {
+                    console.log(`Applying ${LABEL} label to PR:${pr.number} because of file ${pr.migrationFile.filename}`);
                     await github.rest.issues.addLabels({ ...BASE_PARAMS, issue_number: pr.number, labels: [LABEL] });
                 } else if (pr.labels.includes(LABEL)) {
                     console.log(`Removing ${LABEL} label from PR:${pr.number}`);
