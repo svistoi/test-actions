@@ -20,21 +20,21 @@ jobs:
                 return files.find((file) => ["modified", "added"].includes(file.status) && file.filename.startsWith(MIGRATION_PREFIX_PATH));
             };
             const findMigrationFileForPr = async (pr) => {
-                const iterator = github.paginate.iterator(github.rest.pulls.listFiles, { ...BASE_PARAMS, pull_number: pr.number })
+                const iterator = github.paginate.iterator(github.rest.pulls.listFiles, { ...BASE_PARAMS, pull_number: pr.number });
 
                 for await (const { data: files } of iterator) {
-                    migrationFile = findMigrationFile(files)
-                    if (migrationFile) return {...pr, migrationFile: migrationFile}
+                    migrationFile = findMigrationFile(files);
+                    if (migrationFile) return { ...pr, migrationFile: migrationFile };
                 }
-                return pr
-            }
+                return pr;
+            };
             const getPrsWithMaybeMigrationFile = async (sha) => {
-                const {data: pullRequests} = await github.rest.repos.listPullRequestsAssociatedWithCommit({ ...BASE_PARAMS, commit_sha: sha })
-                return Promise.all(pullRequests.map((pr) => findMigrationFileForPr(pr)))
+                return github.rest.repos.listPullRequestsAssociatedWithCommit({ ...BASE_PARAMS, commit_sha: sha })
+                    .then(({ data: pullRequests }) => Promise.all(pullRequests.map((pr) => findMigrationFileForPr(pr))));
             };
 
             const pullRequests = await getPrsWithMaybeMigrationFile(process.env.GITHUB_SHA);
-            const labelPromises = await pullRequests.forEach(async (pr) => {
+            await pullRequests.forEach(async (pr) => {
                 if (pr.migrationFile) {
                     console.log(`Applying ${LABEL} label to PR:${pr.number} because of file ${pr.migrationFile.filename}`);
                     await github.rest.issues.addLabels({ ...BASE_PARAMS, issue_number: pr.number, labels: [LABEL] });
