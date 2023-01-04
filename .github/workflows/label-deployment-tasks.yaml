@@ -6,11 +6,6 @@ on:
       - "lib/identity/repo/data_migrations/*"
       - "priv/repo/seeds/**.exs"
       - "priv/repo/seeds/**.ex"
-  push:
-    paths:
-      - "lib/identity/repo/data_migrations/*"
-      - "priv/repo/seeds/**.exs"
-      - "priv/repo/seeds/**.ex"
 
 jobs:
   apply-label:
