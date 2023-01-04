@@ -2,7 +2,15 @@ name: Label Deployment Tasks
 
 on:
   pull_request:
+    paths:
+      - "lib/identity/repo/data_migrations/*"
+      - "priv/repo/seeds/**.exs"
+      - "priv/repo/seeds/**.ex"
   push:
+    paths:
+      - "lib/identity/repo/data_migrations/*"
+      - "priv/repo/seeds/**.exs"
+      - "priv/repo/seeds/**.ex"
 
 jobs:
   apply-label:
@@ -13,11 +21,12 @@ jobs:
         with:
           script: |
             const LABEL = "Deployment Task";
-            const MIGRATION_PREFIX_PATH = "lib/identity/repo/data_migrations/";
+            const MIGRATION_PREFIX_PATH = ["lib/identity/repo/data_migrations/", "priv/repo/seeds/"];
             const BASE_PARAMS = { owner: context.repo.owner, repo: context.repo.repo };
 
             const findMigrationFile = (files) => {
-                return files.find((file) => ["modified", "added"].includes(file.status) && file.filename.startsWith(MIGRATION_PREFIX_PATH));
+                const nameStartsWith = MIGRATION_PREFIX_PATH.some( (path) => file.filename.startsWith(path) )
+                return files.find((file) => ["modified", "added"].includes(file.status) && nameStartsWith);
             };
             const findMigrationFileForPr = async (pr) => {
                 const iterator = github.paginate.iterator(github.rest.pulls.listFiles, { ...BASE_PARAMS, pull_number: pr.number });
