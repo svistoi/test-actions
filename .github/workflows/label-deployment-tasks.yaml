@@ -35,6 +35,7 @@ jobs:
 
             const pullRequests = await getPrsWithMaybeMigrationFile(process.env.GITHUB_SHA);
             await pullRequests.forEach(async (pr) => {
+                console.log(pr.labels)
                 if (pr.migrationFile) {
                     console.log(`Applying ${LABEL} label to PR:${pr.number} because of file ${pr.migrationFile.filename}`);
                     await github.rest.issues.addLabels({ ...BASE_PARAMS, issue_number: pr.number, labels: [LABEL] });
