@@ -30,7 +30,6 @@ jobs:
                 }
             };
 
-            console.log(context)
             const pr = context.payload.pull_request;
             console.log(`Checking PR:${pr.number}`);
             const migrationFile = await findMigrationFileForPr(pr)
