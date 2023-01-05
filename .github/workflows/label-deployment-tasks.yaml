@@ -20,7 +20,7 @@ jobs:
             const BASE_PARAMS = { owner: context.repo.owner, repo: context.repo.repo };
 
             const findMigrationFile = (files) => {
-                return files.find((file) => ["modified", "added"].includes(file.status) && MIGRATION_PATHS.some( (regex) => regex.test(filename) ));
+                return files.find((file) => ["modified", "added"].includes(file.status) && MIGRATION_PATHS.some( (regex) => regex.test(file.filename) ));
             };
             const findMigrationFileForPr = async (pr) => {
                 const iterator = github.paginate.iterator(github.rest.pulls.listFiles, { ...BASE_PARAMS, pull_number: pr.number });
