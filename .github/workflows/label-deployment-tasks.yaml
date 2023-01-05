@@ -2,6 +2,10 @@ name: Label Deployment Tasks
 
 on:
   pull_request:
+    paths:
+      - 'lib/identity/repo/data_migrations/**.ex'
+      - 'priv/repo/seeds/**.exs'
+      - 'priv/repo/seeds/**.ex'
 
 jobs:
   apply-label:
