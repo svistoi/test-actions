@@ -15,8 +15,8 @@ jobs:
             const MIGRATION_PATHS = [
                 new RegExp("$lib/identity/repo/data_migrations/.*\.ex"),
                 new RegExp("$priv/repo/seeds/.*\.exs"),
-                new RegExp("$priv/repo/seeds/.*\.ex")
-              ];
+                new RegExp("$priv/repo/seeds/.*\.ex"),
+            ];
             const BASE_PARAMS = { owner: context.repo.owner, repo: context.repo.repo };
 
             const findMigrationFile = (files) => {
