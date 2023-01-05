@@ -13,9 +13,9 @@ jobs:
           script: |
             const LABEL = "Deployment Task";
             const MIGRATION_PATHS = [
-                new RegExp("$lib/identity/repo/data_migrations/.*\.ex"),
-                new RegExp("$priv/repo/seeds/.*\.exs"),
-                new RegExp("$priv/repo/seeds/.*\.ex"),
+                new RegExp("^lib/identity/repo/data_migrations/.*\.ex"),
+                new RegExp("^priv/repo/seeds/.*\.exs"),
+                new RegExp("^priv/repo/seeds/.*\.ex"),
             ];
             const BASE_PARAMS = { owner: context.repo.owner, repo: context.repo.repo };
 
@@ -30,7 +30,8 @@ jobs:
                 }
             };
 
-            const pr = context.payload.pull_request
+            console.log(context)
+            const pr = context.payload.pull_request;
             console.log(`Checking PR:${pr.number}`);
             const migrationFile = await findMigrationFileForPr(pr)
             if (migrationFile) {
