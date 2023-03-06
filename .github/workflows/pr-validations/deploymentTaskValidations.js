@@ -48,9 +48,10 @@ module.exports = async ({ github, context, core }) => {
       labels: [LABEL],
     });
 
+    console.log(prInfo.data)
     console.log(prInfo.data.body)
-    console.log(body.match(/^[#]+?\s+?deployment task[s]*?\s*?$/gi))
-    console.log(body.match(/^deployment task[s]*?\S+?---\S+?/gim))
+    console.log(prInfo.data.body.match(/^[#]+?\s+?deployment task[s]*?\s*?$/gi))
+    console.log(prInfo.data.body.match(/^deployment task[s]*?\S+?---\S+?/gim))
     if (!hasDeploymentTaskInBody(prInfo.data.body)) {
       core.error(
         'You are missing the Deployment Task, add a deployment task block declaration to your PR Body, like the example below:\r\n' +
