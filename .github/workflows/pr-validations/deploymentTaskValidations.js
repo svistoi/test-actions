@@ -26,7 +26,7 @@ module.exports = async ({ github, context, core }) => {
     }
   };
 
-  const hasDeploymentTaskInBody = (body) => new RegExp(/^[#]+?\s+?deployment task[s]*?\s*?$/gi).test(body) || new RegEx(/^deployment task[s]*?\S+?---\S+?/gim).test(body)
+  const hasDeploymentTaskInBody = (body) => new RegExp(/^[#]*?\s+?deployment task[s]*?\s*?$/gi).test(body)
 
   const pr = context.payload.pull_request;
 
