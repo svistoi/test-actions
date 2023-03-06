@@ -1,0 +1,24 @@
+name: PR Validations
+
+on:
+  pull_request:
+
+jobs:
+  deployment-task-validations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/github-script@v6
+        with:
+          script: |
+            const script = require('.github/workflows/pr-validations/deploymentTaskValidations.js')
+            await script({github, context, core})
+  jira-ticket-id-validations:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - uses: actions/github-script@v6
+          with:
+            script: |
+              const script = require('.github/workflows/pr-validations/jiraTicketIdValidations.js')
+              await script({github, context, core})
