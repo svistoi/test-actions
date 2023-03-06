@@ -51,7 +51,7 @@ module.exports = async ({ github, context, core }) => {
     body = prInfo.data.body
     console.log(body)
     console.log(new RegExp(/^[#]+?\s+?deployment task[s]*?\s*?$/gi).test(body))
-    console.log(new RegEx(/^deployment task[s]*?\S+?---\S+?/gim).test(body))
+    console.log(new RegExp(/^deployment task[s]*?\S+?---\S+?/gim).test(body))
 
     if (!hasDeploymentTaskInBody(prInfo.data.body)) {
       core.error(
