@@ -26,7 +26,7 @@ module.exports = async ({ github, context, core }) => {
     }
   };
 
-  const hasDeploymentTaskInBody = (body) => body.match(/^[#]+?\s+?deployment task[s]*?\s*?$/gi) || body.match(/^deployment task[s]*?\S+?---\S+?/gim)
+  const hasDeploymentTaskInBody = (body) => new RegExp(/^[#]+?\s+?deployment task[s]*?\s*?$/gi).test(body) || new RegEx(/^deployment task[s]*?\S+?---\S+?/gim).test(body)
 
   const pr = context.payload.pull_request;
 
@@ -48,10 +48,11 @@ module.exports = async ({ github, context, core }) => {
       labels: [LABEL],
     });
 
-    console.log(prInfo.data)
-    console.log(prInfo.data.body)
-    console.log(prInfo.data.body.match(/^[#]+?\s+?deployment task[s]*?\s*?$/gi))
-    console.log(prInfo.data.body.match(/^deployment task[s]*?\S+?---\S+?/gim))
+    body = prInfo.data.body
+    console.log(body)
+    console.log(new RegExp(/^[#]+?\s+?deployment task[s]*?\s*?$/gi).test(body))
+    console.log(new RegEx(/^deployment task[s]*?\S+?---\S+?/gim).test(body))
+
     if (!hasDeploymentTaskInBody(prInfo.data.body)) {
       core.error(
         'You are missing the Deployment Task, add a deployment task block declaration to your PR Body, like the example below:\r\n' +
