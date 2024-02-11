@@ -1,7 +1,7 @@
 name: Danger Report
 on:
   pull_request:
-    types: [opened, reopened, edited, ready_for_review, labeled, unlabeled, assigned, unassigned]
+    types: [assigned, edited, labeled, opened, ready_for_review, reopened, review_requested, synchronize, unassigned, unlabeled]
 
 jobs:
   danger:
