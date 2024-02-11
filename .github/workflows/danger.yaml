@@ -1,0 +1,35 @@
+name: Danger Report
+on:
+  pull_request:
+    types: [opened, reopened, edited, ready_for_review, labeled, unlabeled, assigned, unassigned]
+
+jobs:
+  danger:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+      - uses: actions/cache@v4
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0.0'
+          bundler-cache: true
+      - name: Lint Dangerfile and Utilities
+        run: bundle exec rubocop
+      - name: Unit Test Dangerfile Utilities
+        run: bundle exec rspec danger/spec/*
+      - uses: MeilCli/danger-action@v5
+        with:
+          plugins_file: 'Gemfile'
+          install_path: 'vendor/bundle'
+          danger_file: 'Dangerfile'
+          danger_id: 'danger-pr'
+        env:
+          DANGER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
