@@ -19,7 +19,7 @@ jobs:
             ${{ runner.os }}-gems-
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3.0'
+          ruby-version: '3.0.0'
           bundler-cache: true
       - name: Lint Dangerfile and Utilities
         run: bundle exec rubocop
