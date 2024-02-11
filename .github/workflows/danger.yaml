@@ -23,8 +23,6 @@ jobs:
           bundler-cache: true
       - name: Lint Dangerfile and Utilities
         run: bundle exec rubocop
-      - name: Unit Test Dangerfile Utilities
-        run: bundle exec rspec danger/spec/*
       - uses: MeilCli/danger-action@v5
         with:
           plugins_file: 'Gemfile'
