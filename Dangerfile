@@ -7,7 +7,11 @@ puts(!marked_no_deployment_dependancy)
 puts(!has_deployment_dependancy_label)
 puts(!has_deployment_dependancy_description)
 
-if !marked_no_deployment_dependancy && (!has_deployment_dependancy_label && !has_deployment_dependancy_description)
-  failure("Please check off that this PR has no service deployment dependancies
-  or add a label and description under heading 'Deployment Dependancy' describing the dependancy")
+if !marked_no_deployment_dependancy && !has_deployment_dependancy_label
+  failure("Pleae explicitly check off [ ] This change does not add a deployment dependancy
+  or add 'Deployment Dependancy' label and description")
+end
+
+if has_deployment_dependancy_label && !has_deployment_dependancy_description
+  failure("Please add 'Deployment Dependancy' heading to PR description with description of services involved")
 end
