@@ -4,9 +4,9 @@ marked_no_deployment_dependency = github.pr_body =~ /\[X\] This change does not 
 has_deployment_dependency_label = github.pr_labels.include? 'Deployment Dependency'
 has_deployment_dependency_description = github.pr_body =~ /[#\s]*?deployment dependency[s\s]*?$/ix
 puts(github.pr_body)
-puts(!marked_no_deployment_dependency)
-puts(!has_deployment_dependency_label)
-puts(!has_deployment_dependency_description)
+puts(marked_no_deployment_dependency)
+puts(has_deployment_dependency_label)
+puts(has_deployment_dependency_description)
 
 if !marked_no_deployment_dependency && !has_deployment_dependency_label
   failure("Pleae explicitly check off [ ] This change does not add a deployment dependency
