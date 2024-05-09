@@ -2,7 +2,6 @@
 
 require 'json'
 
-message("#{github.pr_json.inspect}")
 message("#{github.pr_json['number']}")
 
 pr_details = github.api.pull_request('svistoi/test-actions', github.pr_json['number'])
