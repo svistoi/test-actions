@@ -1,3 +1,5 @@
 # frozen_string_literal: true
 
-message(github.pr_json)
+require json
+
+message(JSON.generate(github.pr_json))
