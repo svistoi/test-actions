@@ -17,4 +17,4 @@ if has_deployment_dependency_label && !has_deployment_dependency_description
   failure("Please add 'Deployment Dependency' heading to PR description with description of services involved")
 end
 
-warn(github.pr_json["milestone"])
+warn(github.pr_json['milestone'])
