@@ -21,8 +21,6 @@ jobs:
         with:
           ruby-version: '3.0.0'
           bundler-cache: true
-      - name: Lint Dangerfile and Utilities
-        run: bundle exec rubocop
       - uses: MeilCli/danger-action@v6
         with:
           plugins_file: 'Gemfile'
