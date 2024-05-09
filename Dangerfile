@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-warn(github.pr_json['milestone'])
+failure(github.pr_json['milestone'])
