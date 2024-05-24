@@ -2,8 +2,9 @@
 
 require 'json'
 
-message("#{github.pr_json['number']}")
+message(github.pr_json['number'])
 
 pr_details = github.api.pull_request('svistoi/test-actions', github.pr_json['number'])
+reviewers = pr_details['requested_reviewers'].map(&:login)
 
-message("pr_details['requested_reviewers']")
+author = pr_details['requested_reviewers'].map(&:login)
