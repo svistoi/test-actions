@@ -1,0 +1,14 @@
+name: Multiname
+on:
+  pull_request:
+    types: [labeled]
+
+jobs:
+  script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+      - name: Script 2
+        run: echo "script 2"

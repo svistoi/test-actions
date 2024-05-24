@@ -1,0 +1,14 @@
+name: Multiname
+on:
+  pull_request:
+    types: [assigned, edited, opened, ready_for_review, reopened, review_requested, synchronize, unassigned, unlabeled]
+
+jobs:
+  script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+      - name: Script 1
+        run: echo "script 1"
