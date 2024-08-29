@@ -5,7 +5,6 @@ on:
     types: [submitted, edited]
   pull_request:
 
-#
 jobs:
   test:
     if: ${{ !github.event.pull_request.draft && (startsWith(github.event.pull_request.base.ref, 'release/') || github.event.pull_request.base.ref == 'develop') }}
