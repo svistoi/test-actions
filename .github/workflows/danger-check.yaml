@@ -36,22 +36,6 @@ jobs:
           node-version: 18
           cache: "npm"
 
-      - name: cache danger
-        id: cache-danger
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-danger
-        with:
-          path: /opt/hostedtoolcache/node/18**/
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-danger-12.3.3
-
-      - name: install yarn dependencies
-        if: steps.cache-danger.outputs.cache-hit != 'true'
-        run: |
-          npm install -g danger@12.3.3 typescript@5.6.3
-          npm list -g
-          ls /opt/hostedtoolcache/node/18**/
-
       - name: Rerun danger check on pull request
         run: |
           danger ci --dangerfile ${{ inputs.dangerfile-path }}
