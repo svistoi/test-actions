@@ -19,9 +19,9 @@ on:
         description: "api token used by danger, if danger check uses elevated API then default GITHUB_TOKEN will not suffice"
         required: true
 
-concurrency:
-  group: danger-${{ github.ref }}
-  cancel-in-progress: true
+#concurrency:
+#  group: danger-${{ github.ref }}
+#  cancel-in-progress: true
 
 jobs:
   danger-check:
