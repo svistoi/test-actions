@@ -34,7 +34,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: "npm"
+          cache: "yarn"
 
       - name: Rerun danger check on pull request
         run: |
