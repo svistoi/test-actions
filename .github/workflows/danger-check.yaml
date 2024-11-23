@@ -38,6 +38,6 @@ jobs:
 
       - name: Rerun danger check on pull request
         run: |
-          danger ci --dangerfile ${{ inputs.dangerfile-path }}
+          yarn danger ci --dangerfile ${{ inputs.dangerfile-path }}
         env:
           DANGER_GITHUB_API_TOKEN: ${{ secrets.danger-api-token }}
