@@ -37,6 +37,9 @@ jobs:
           cache: "yarn"
           cache-dependency-path: "./yarn.lock"
 
+      - name: yarn install
+        run: yarn install
+
       - name: Rerun danger check on pull request
         run: |
           yarn danger ci --dangerfile ${{ inputs.dangerfile-path }}
