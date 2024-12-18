@@ -19,14 +19,15 @@ on:
         description: "api token used by danger, if danger check uses elevated API then default GITHUB_TOKEN will not suffice"
         required: true
 
-#concurrency:
-#  group: danger-${{ github.ref }}
-#  cancel-in-progress: true
-
 jobs:
   danger-check:
     runs-on: ubuntu-latest
     steps:
+      - uses: cycodelabs/cimon-action@v0
+        with:
+          client-id: ${{ secrets.CIMON_CLIENT_ID }}
+          secret: ${{ secrets.CIMON_CLIENT_SECRET }}
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: ${{ inputs.fetch-depth }}
@@ -34,11 +35,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: "yarn"
-          cache-dependency-path: "yarn.lock"
+          cache: 'yarn'
+          cache-dependency-path: 'danger/yarn.lock'
+
+      - name: install dependencies
+        working-directory: ./danger
+        run: |
+          yarn install --frozen-lockfile
 
       - name: Rerun danger check on pull request
+        working-directory: ./danger
         run: |
-          yarn danger ci --dangerfile ${{ inputs.dangerfile-path }}
+          yarn danger ci --dangerfile ./danger.ts
         env:
           DANGER_GITHUB_API_TOKEN: ${{ secrets.danger-api-token }}
